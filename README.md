@@ -1,0 +1,1 @@
+# gameseed-checker
