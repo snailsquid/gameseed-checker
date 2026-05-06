@@ -9,19 +9,21 @@ let pcFilePath = null;
 
 window.currentResults = null;
 window.history = [];
+let history = [];
 
+// Expose functions immediately
 function renderHistory() {
     const historyList = document.getElementById('history-list');
     if (!historyList) return;
 
-    if (window.history.length === 0) {
+    if (history.length === 0) {
         historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
         return;
     }
 
     let html = '';
-    for (let i = 0; i < window.history.length; i++) {
-        const entry = window.history[i];
+    for (let i = 0; i < history.length; i++) {
+        const entry = history[i];
         const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
         const statusText = entry.verified ? 'Verified' : 'Not Verify';
         html += `<div class="history-item">
@@ -33,7 +35,7 @@ function renderHistory() {
                         <span>${entry.category}</span>
                     </div>
                 </div>
-                <button class="history-delete-btn" onclick="window.deleteHistoryItem(${i})">×</button>
+                <button class="history-delete-btn" onclick="deleteHistoryItem(${i})">×</button>
             </div>
         </div>`;
     }
@@ -41,7 +43,8 @@ function renderHistory() {
 }
 
 function deleteHistoryItem(index) {
-    window.history.splice(index, 1);
+    history.splice(index, 1);
+    window.history = history;
     renderHistory();
 }
 
@@ -58,9 +61,10 @@ function addToHistory(results) {
     }
 
     for (const teamName in teams) {
-        window.history.unshift(teams[team]);
-        if (window.history.length > 50) window.history.pop();
+        history.unshift(teams[team]);
+        if (history.length > 50) history.pop();
     }
+    window.history = history;
 
     renderHistory();
 }
