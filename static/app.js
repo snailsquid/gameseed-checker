@@ -303,6 +303,8 @@ function addToHistory(results) {
     }
 
     for (const teamName in teams) {
+        // Skip if team already in history
+        if (history.some(h => h.team === teamName)) continue;
         history.unshift(teams[teamName]);
         if (history.length > 50) history.pop();
     }
