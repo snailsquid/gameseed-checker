@@ -303,9 +303,10 @@ function addToHistory(results) {
     }
 
     for (const teamName in teams) {
-        window.appHistory.unshift(teams[teamName]);
-        if (window.appHistory.length > 50) window.appHistory.pop();
+        history.unshift(teams[teamName]);
+        if (history.length > 50) history.pop();
     }
+    window.appHistory = history;
 
     renderHistory();
 }
