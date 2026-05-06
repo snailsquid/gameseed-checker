@@ -8,7 +8,7 @@ let mobileFilePath = null;
 let pcFilePath = null;
 
 window.currentResults = null;
-window.history = [];
+window.appHistory = [];
 let history = [];
 
 // Expose functions immediately
@@ -48,7 +48,7 @@ function renderHistory() {
 
 function deleteHistoryItem(index) {
     history.splice(index, 1);
-    window.history = history;
+    window.appHistory = history;
     renderHistory();
 }
 
@@ -68,7 +68,7 @@ function addToHistory(results) {
         history.unshift(teams[team]);
         if (history.length > 50) history.pop();
     }
-    window.history = history;
+    window.appHistory = history;
 
     renderHistory();
 }
@@ -286,7 +286,7 @@ function renderHistory() {
 
 function deleteHistoryItem(index) {
     history.splice(index, 1);
-    window.history = history;
+    window.appHistory = history;
     renderHistory();
 }
 
@@ -303,8 +303,8 @@ function addToHistory(results) {
     }
 
     for (const teamName in teams) {
-        window.history.unshift(teams[teamName]);
-        if (window.history.length > 50) window.history.pop();
+        window.appHistory.unshift(teams[teamName]);
+        if (window.appHistory.length > 50) window.appHistory.pop();
     }
 
     renderHistory();
@@ -315,9 +315,9 @@ window.addToHistory = addToHistory;
 window.deleteHistoryItem = deleteHistoryItem;
 
 function copyHistory() {
-    if (window.history.length === 0) return;
+    if (window.appHistory.length === 0) return;
 
-    const text = window.history.map(h => `${h.team}\t${h.verified ? 'Verified' : 'Not Verify'}\t\t${h.category}`).join('\n');
+    const text = window.appHistory.map(h => `${h.team}\t${h.verified ? 'Verified' : 'Not Verify'}\t\t${h.category}`).join('\n');
     try {
         navigator.clipboard.writeText(text);
         alert('History copied!');
