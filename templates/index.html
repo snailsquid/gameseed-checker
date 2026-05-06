@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAMESEED 2026 - Participant Checker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="header">
+        <span class="header-title">GAMESEED 2026 Participant Checker</span>
+        <span id="status" class="header-status">No CSV loaded</span>
+    </header>
+
+    <div class="main-container">
+        <main class="main-content">
+            <div class="data-source">
+                <div class="card-group">
+                    <div class="card">
+                        <span class="card-label">Mobile</span>
+                        <span class="card-count" id="mobile-count"></span>
+                        <button id="mobile-browse" class="card-btn">Browse</button>
+                    </div>
+                    <div class="card">
+                        <span class="card-label">PC</span>
+                        <span class="card-count" id="pc-count"></span>
+                        <button id="pc-browse" class="card-btn">Browse</button>
+                    </div>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat-pill stat-total">
+                        <span>Total</span>
+                        <span class="stat-value" id="stat-total">--</span>
+                    </div>
+                    <div class="stat-pill stat-registered">
+                        <span>Registered</span>
+                        <span class="stat-value" id="stat-found">--</span>
+                    </div>
+                    <div class="stat-pill stat-not-found">
+                        <span>Not Found</span>
+                        <span class="stat-value" id="stat-notfound">--</span>
+                    </div>
+                    <div class="stat-pill stat-mobile">
+                        <span>Mobile</span>
+                        <span class="stat-value" id="stat-mobile">--</span>
+                    </div>
+                    <div class="stat-pill stat-pc">
+                        <span>PC</span>
+                        <span class="stat-value" id="stat-pc">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-results-row">
+                <div class="paste-section">
+                    <span class="section-label">Paste Names (Nama Lengkap @discord)</span>
+                    <div class="input-wrapper">
+                        <textarea id="names-input" class="input-box" placeholder="Waguri @Wagureng
+Rentarou @BossTokoKue">Waguri @Wagureng
+Rentarou @BossTokoKue</textarea>
+                    </div>
+                    <div class="button-row">
+                        <button id="check-btn" class="btn">Check</button>
+                        <button id="clear-btn" class="btn btn-outline">Clear</button>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <span class="section-label">Results</span>
+                    <div class="results-wrapper">
+                        <div class="results-panel">
+                            <div id="all-results" class="results-table-container"></div>
+                        </div>
+                        <div class="copyable-section">
+                            <pre id="results-box" class="results-text">Nothing to see here</pre>
+                            <span class="copy-hint" onclick="copyResults()">Copy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="gif-float">
+        <img src="/static/images.steamusercontent.gif" alt="GIF" onerror="this.parentElement.style.display='none'">
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+    function copyResults() {
+        const text = document.getElementById('results-box').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const hint = document.querySelector('.copy-hint');
+            hint.textContent = 'Copied!';
+            setTimeout(() => hint.textContent = 'Copy', 1000);
+        });
+    }
+    </script>
+</body>
+</html>

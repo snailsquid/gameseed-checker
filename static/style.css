@@ -1,0 +1,345 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #ffffff;
+  --surface: #f7f7f7;
+  --border: #e5e5e5;
+  --accent: #10a37f;
+  --accent-hover: #0d8a6a;
+  --text: #1a1a1a;
+  --text-dim: #666666;
+  --text-muted: #999999;
+  --error: #ef4444;
+  --blue: #3b82f6;
+  --radius: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.header-status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.header-status.ok { color: var(--accent); }
+
+.main-container {
+  display: flex;
+  height: calc(100vh - 44px);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.data-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.card-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.card-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.card-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.card-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stats-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.stat-pill .stat-value { font-weight: 600; }
+.stat-pill.stat-total .stat-value { color: var(--text); }
+.stat-pill.stat-registered .stat-value { color: var(--accent); }
+.stat-pill.stat-not-found .stat-value { color: var(--error); }
+.stat-pill.stat-mobile .stat-value { color: var(--blue); }
+.stat-pill.stat-pc .stat-value { color: var(--text-dim); }
+
+.input-results-row {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.paste-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.input-box {
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-box:focus { border-color: var(--accent); }
+.input-box::placeholder { color: var(--text-muted); }
+
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 16px;
+  height: 32px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover { background: var(--accent-hover); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.results-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.results-wrapper {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.results-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.results-table-container {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 120px;
+}
+
+.copyable-section {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
+.results-text {
+  font-size: 13px;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.results-table th,
+.results-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-table th {
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+}
+
+.results-table td {
+  color: var(--text);
+}
+
+.results-table tbody tr:hover {
+  background: var(--bg);
+}
+
+.copy-hint {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.results-wrapper:hover .copy-hint {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.gif-float {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.gif-float img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 700px) {
+  .main-container { flex-direction: column; }
+  .gif-float { display: none; }
+  .data-source { flex-direction: column; }
+  .input-results-row { flex-direction: column; }
+}
