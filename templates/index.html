@@ -97,8 +97,19 @@ Rentarou @BossTokoKue</textarea>
 
 <script src="/static/app.js"></script>
     <script>
+    // Mock history - add directly to window.history
+    window.history = [
+        { team: 'Test Team 1', verified: true, category: 'Mobile' },
+        { team: 'Test Team 2', verified: false, category: 'PC' }
+    ];
+    history = window.history; // sync local
+
     // Make inline script use same history as app.js
     function copyResults() {
+        console.log('copyResults called');
+        console.log('window.currentResults:', window.currentResults);
+        console.log('window.addToHistory:', typeof window.addToHistory);
+
         const text = document.getElementById('results-box').textContent;
         navigator.clipboard.writeText(text).then(() => {
             const hint = document.querySelector('.copy-hint');
@@ -109,7 +120,10 @@ Rentarou @BossTokoKue</textarea>
         });
         // Use app.js's addToHistory if available
         if (window.currentResults && window.currentResults.length > 0 && window.addToHistory) {
+            console.log('Calling addToHistory');
             window.addToHistory(window.currentResults);
+        } else {
+            console.log('Skipping addToHistory - conditions not met');
         }
     }
 
