@@ -10,6 +10,65 @@ let pcFilePath = null;
 window.currentResults = null;
 window.history = [];
 
+function renderHistory() {
+    const historyList = document.getElementById('history-list');
+    if (!historyList) return;
+
+    if (window.history.length === 0) {
+        historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
+        return;
+    }
+
+    let html = '';
+    for (let i = 0; i < window.history.length; i++) {
+        const entry = window.history[i];
+        const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
+        const statusText = entry.verified ? 'Verified' : 'Not Verify';
+        html += `<div class="history-item">
+            <div class="history-item-row">
+                <div class="history-item-info">
+                    <div class="history-item-team">${escapeHtml(entry.team)}</div>
+                    <div class="history-item-status">
+                        <span class="${statusClass}">${statusText}</span>
+                        <span>${entry.category}</span>
+                    </div>
+                </div>
+                <button class="history-delete-btn" onclick="window.deleteHistoryItem(${i})">×</button>
+            </div>
+        </div>`;
+    }
+    historyList.innerHTML = html;
+}
+
+function deleteHistoryItem(index) {
+    window.history.splice(index, 1);
+    renderHistory();
+}
+
+function addToHistory(results) {
+    const verified = results.filter(r => r.verified);
+    if (verified.length === 0) return;
+
+    const teams = {};
+    for (const r of verified) {
+        const team = r.team || '(No Team)';
+        if (!teams[team]) {
+            teams[team] = { team, verified: true, category: r.source };
+        }
+    }
+
+    for (const teamName in teams) {
+        window.history.unshift(teams[team]);
+        if (window.history.length > 50) window.history.pop();
+    }
+
+    renderHistory();
+}
+
+window.addToHistory = addToHistory;
+window.deleteHistoryItem = deleteHistoryItem;
+window.renderHistory = renderHistory;
+
 async function selectFile(kind) {
     try {
         const result = await pywebview.api.open_file_dialog();

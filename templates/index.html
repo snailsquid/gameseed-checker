@@ -104,8 +104,8 @@ Rentarou @BossTokoKue</textarea>
             hint.textContent = 'Copied!';
             setTimeout(() => hint.textContent = 'Copy', 1000);
         });
-        if (window.currentResults && window.currentResults.length > 0) {
-            window.addToHistory && window.addToHistory(window.currentResults);
+        if (window.currentResults && window.currentResults.length > 0 && window.addToHistory) {
+            window.addToHistory(window.currentResults);
         }
     }
     </script>
