@@ -179,6 +179,17 @@ def do_check(data):
 
     verified_results = [r for r in results if r["verified"]]
     if verified_results:
+        teams = [r["team"] for r in verified_results if r["team"]]
+        if len(teams) > 1:
+            same_team = True
+            for i in range(1, len(teams)):
+                if fuzz.token_set_ratio(teams[0].lower(), teams[i].lower()) < 80:
+                    same_team = False
+                    break
+            if not same_team:
+                names_str = ', '.join(r["name"] for r in verified_results)
+                return {'error': f'Team tidak sama. Pilih satu team. {names_str}'}
+
         sources = []
         for r in verified_results:
             sources.extend(s.strip() for s in r["source"].split(','))
