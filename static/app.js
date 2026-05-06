@@ -13,12 +13,8 @@ let history = [];
 
 // Expose functions immediately
 function renderHistory() {
-    console.log('renderHistory called, history length:', history.length);
     const historyList = document.getElementById('history-list');
-    if (!historyList) {
-        console.log('history-list element not found!');
-        return;
-    }
+    if (!historyList) return;
 
     if (history.length === 0) {
         historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
@@ -224,45 +220,6 @@ function displayResults(data) {
     }
 
     document.getElementById('results-box').textContent = copyText;
-}
-
-function renderHistory() {
-    const historyList = document.getElementById('history-list');
-    if (!historyList) {
-        console.log('history-list element not found');
-        return;
-    }
-
-    if (history.length === 0) {
-        historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
-        return;
-    }
-
-    let html = '';
-    for (let i = 0; i < history.length; i++) {
-        const entry = history[i];
-        const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
-        const statusText = entry.verified ? 'Verified' : 'Not Verify';
-        html += `<div class="history-item">
-            <div class="history-item-row">
-                <div class="history-item-info">
-                    <div class="history-item-team">${escapeHtml(entry.team)}</div>
-                    <div class="history-item-status">
-                        <span class="${statusClass}">${statusText}</span>
-                        <span>${entry.category}</span>
-                    </div>
-                </div>
-                <button class="history-delete-btn" onclick="deleteHistoryItem(${i})">×</button>
-            </div>
-        </div>`;
-    }
-    historyList.innerHTML = html;
-}
-
-function deleteHistoryItem(index) {
-    history.splice(index, 1);
-    window.appHistory = history;
-    renderHistory();
 }
 
 function addToHistory(results) {
