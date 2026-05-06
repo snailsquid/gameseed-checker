@@ -316,6 +316,7 @@ function copyHistory() {
         console.error('Error copying history:', err);
     }
 }
+window.copyHistory = copyHistory;
 
 /**
  * Escape HTML for safe rendering

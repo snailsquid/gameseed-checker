@@ -95,80 +95,30 @@ Rentarou @BossTokoKue</textarea>
         <img src="/static/images.steamusercontent.gif" alt="GIF" onerror="this.parentElement.style.display='none'">
     </div>
 
-    <script src="/static/app.js"></script>
+<script src="/static/app.js"></script>
     <script>
-    window.appHistory = [];
-
-    function renderHistoryInline() {
-        const historyList = document.getElementById('history-list');
-        if (!historyList) return;
-        if (window.appHistory.length === 0) {
-            historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
-            return;
-        }
-        let html = '';
-        for (let i = 0; i < window.appHistory.length; i++) {
-            const entry = window.appHistory[i];
-            const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
-            const statusText = entry.verified ? 'Verified' : 'Not Verify';
-            html += '<div class="history-item">' +
-                '<div class="history-item-row">' +
-                '<div class="history-item-info">' +
-                '<div class="history-item-team">' + escapeHtmlInline(entry.team) + '</div>' +
-                '<div class="history-item-status">' +
-                '<span class="' + statusClass + '">' + statusText + '</span>' +
-                '<span>' + entry.category + '</span></div></div>' +
-                '<button class="history-delete-btn" onclick="deleteHistoryInline(' + i + ')">×</button></div></div>';
-        }
-        historyList.innerHTML = html;
-    }
-
-    function escapeHtmlInline(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function addToHistoryInline(results) {
-        const verified = results.filter(r => r.verified);
-        if (verified.length === 0) return;
-        const teams = {};
-        for (const r of verified) {
-            const team = r.team || '(No Team)';
-            if (!teams[team]) {
-                teams[team] = { team, verified: true, category: r.source };
-            }
-        }
-        for (const teamName in teams) {
-            window.appHistory.unshift(teams[team]);
-            if (window.appHistory.length > 50) window.appHistory.pop();
-        }
-        renderHistoryInline();
-    }
-
-    function deleteHistoryInline(index) {
-        window.appHistory.splice(index, 1);
-        renderHistoryInline();
-    }
-
-    function copyHistoryInline() {
-        if (window.appHistory.length === 0) return;
-        const text = window.appHistory.map(h => h.team + '\t' + (h.verified ? 'Verified' : 'Not Verify') + '\t\t' + h.category).join('\n');
-        navigator.clipboard.writeText(text);
-        alert('History copied!');
-    }
-
+    // Make inline script use same history as app.js
     function copyResults() {
         const text = document.getElementById('results-box').textContent;
         navigator.clipboard.writeText(text).then(() => {
             const hint = document.querySelector('.copy-hint');
             hint.textContent = 'Copied!';
             setTimeout(() => hint.textContent = 'Copy', 1000);
+        }).catch(err => {
+            console.error('Error copying:', err);
         });
-        if (window.currentResults && window.currentResults.length > 0) {
-            addToHistoryInline(window.currentResults);
+        // Use app.js's addToHistory if available
+        if (window.currentResults && window.currentResults.length > 0 && window.addToHistory) {
+            window.addToHistory(window.currentResults);
         }
     }
+
+    // Copy history button handler
+    document.getElementById('copy-history-btn').addEventListener('click', function() {
+        if (typeof copyHistory === 'function') {
+            copyHistory();
+        }
+    });
     </script>
 </body>
 </html>
