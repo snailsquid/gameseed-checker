@@ -227,15 +227,36 @@ function addToHistory(results) {
     if (verified.length === 0) return;
 
     const teams = {};
+    const nameCount = {};
+
     for (const r of verified) {
         const team = r.team || '(No Team)';
+        const name = r.name || '(No Name)';
+
         if (!teams[team]) {
-            teams[team] = { team, verified: true, category: r.source };
+            teams[team] = { team, verified: true, category: r.source, name };
+            nameCount[team] = {};
+            nameCount[team][name] = 1;
+        } else {
+            nameCount[team][name] = (nameCount[team][name] || 0) + 1;
         }
     }
 
     for (const teamName in teams) {
-        // Skip if team already in history
+        let mostCommonName = teams[teamName].name;
+        let maxCount = nameCount[teamName][mostCommonName] || 1;
+
+        for (const name in nameCount[teamName]) {
+            if (nameCount[teamName][name] > maxCount) {
+                maxCount = nameCount[teamName][name];
+                mostCommonName = name;
+            }
+        }
+
+        teams[teamName].name = mostCommonName;
+    }
+
+    for (const teamName in teams) {
         if (history.some(h => h.team === teamName)) continue;
         history.unshift(teams[teamName]);
         if (history.length > 50) history.pop();
