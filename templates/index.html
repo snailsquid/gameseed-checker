@@ -52,30 +52,40 @@
             </div>
 
             <div class="input-results-row">
-                <div class="paste-section">
-                    <span class="section-label">Paste Names (Nama Lengkap @discord)</span>
-                    <div class="input-wrapper">
-                        <textarea id="names-input" class="input-box" placeholder="Waguri @Wagureng
+                <div class="paste-results-col">
+                    <div class="paste-section">
+                        <span class="section-label">Paste Names (Nama Lengkap @discord)</span>
+                        <div class="input-wrapper">
+                            <textarea id="names-input" class="input-box" placeholder="Waguri @Wagureng
 Rentarou @BossTokoKue">Waguri @Wagureng
 Rentarou @BossTokoKue</textarea>
+                        </div>
+                        <div class="button-row">
+                            <button id="check-btn" class="btn">Check</button>
+                            <button id="clear-btn" class="btn btn-outline">Clear</button>
+                        </div>
                     </div>
-                    <div class="button-row">
-                        <button id="check-btn" class="btn">Check</button>
-                        <button id="clear-btn" class="btn btn-outline">Clear</button>
+
+                    <div class="results-section">
+                        <span class="section-label">Results</span>
+                        <div class="results-wrapper">
+                            <div class="results-panel">
+                                <div id="all-results" class="results-table-container"></div>
+                            </div>
+                            <div class="copyable-section">
+                                <pre id="results-box" class="results-text">Nothing to see here</pre>
+                                <span class="copy-hint" onclick="copyResults()">Copy</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="results-section">
-                    <span class="section-label">Results</span>
-                    <div class="results-wrapper">
-                        <div class="results-panel">
-                            <div id="all-results" class="results-table-container"></div>
-                        </div>
-                        <div class="copyable-section">
-                            <pre id="results-box" class="results-text">Nothing to see here</pre>
-                            <span class="copy-hint" onclick="copyResults()">Copy</span>
-                        </div>
+                <div class="history-section">
+                    <div class="history-header">
+                        <span class="section-label">History</span>
+                        <button id="copy-history-btn" class="btn btn-small">Copy</button>
                     </div>
+                    <div id="history-list" class="history-list"></div>
                 </div>
             </div>
         </main>

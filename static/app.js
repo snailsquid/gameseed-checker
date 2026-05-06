@@ -6,6 +6,8 @@
 // Store file paths
 let mobileFilePath = null;
 let pcFilePath = null;
+let currentResults = null;
+let history = [];
 
 const SOURCE_PADDING = 12;
 
@@ -132,6 +134,7 @@ async function checkParticipants() {
  */
 function displayResults(data) {
     const stats = data.stats;
+    currentResults = data.results || [];
 
     document.getElementById('stat-total').textContent = stats.total;
     document.getElementById('stat-found').textContent = stats.registered_count;
@@ -139,7 +142,7 @@ function displayResults(data) {
     document.getElementById('stat-mobile').textContent = stats.mobile_count;
     document.getElementById('stat-pc').textContent = stats.pc_count;
 
-    const results = data.results || [];
+    const results = currentResults;
     const allResults = document.getElementById('all-results');
 
     let tableRows = '';
@@ -182,6 +185,61 @@ function displayResults(data) {
     document.getElementById('results-box').textContent = copyText;
 }
 
+function renderHistory() {
+    const historyList = document.getElementById('history-list');
+
+    if (history.length === 0) {
+        historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
+        return;
+    }
+
+    let html = '';
+    for (const entry of history) {
+        const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
+        const statusText = entry.verified ? 'Verified' : 'Not Verify';
+        html += `<div class="history-item">
+            <div class="history-item-team">${escapeHtml(entry.team)}</div>
+            <div class="history-item-status">
+                <span class="${statusClass}">${statusText}</span>
+                <span>${entry.category}</span>
+            </div>
+        </div>`;
+    }
+    historyList.innerHTML = html;
+}
+
+function addToHistory(results) {
+    const verified = results.filter(r => r.verified);
+    if (verified.length === 0) return;
+
+    const teams = {};
+    for (const r of verified) {
+        const team = r.team || '(No Team)';
+        if (!teams[team]) {
+            teams[team] = { team, verified: true, category: r.source };
+        }
+    }
+
+    for (const teamName in teams) {
+        history.unshift(teams[team]);
+        if (history.length > 50) history.pop();
+    }
+
+    renderHistory();
+}
+
+async function copyHistory() {
+    if (history.length === 0) return;
+
+    const text = history.map(h => `${h.team}\t${h.verified ? 'Verified' : 'Not Verify'}\t\t${h.category}`).join('\n');
+    try {
+        await navigator.clipboard.writeText(text);
+        alert('History copied!');
+    } catch (err) {
+        console.error('Error copying history:', err);
+    }
+}
+
 /**
  * Escape HTML for safe rendering
  * @param {string} text - Text to escape
@@ -220,11 +278,15 @@ function clearResults() {
  */
 async function copyResults() {
     const resultsText = document.getElementById('results-box').textContent;
-    
+
     if (!resultsText) {
         return;
     }
-    
+
+    if (currentResults && currentResults.length > 0) {
+        addToHistory(currentResults);
+    }
+
     try {
         await navigator.clipboard.writeText(resultsText);
         alert('Results copied to clipboard!');
@@ -264,6 +326,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (copyBtn) {
         copyBtn.addEventListener('click', copyResults);
     }
-    
+
+    // Copy history button
+    const copyHistoryBtn = document.getElementById('copy-history-btn');
+    if (copyHistoryBtn) {
+        copyHistoryBtn.addEventListener('click', copyHistory);
+    }
+
+    renderHistory();
     loadSavedPaths();
 });
