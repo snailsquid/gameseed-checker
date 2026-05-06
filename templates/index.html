@@ -97,6 +97,13 @@ Rentarou @BossTokoKue</textarea>
 
 <script src="/static/app.js"></script>
     <script>
+    // Mock history for testing - remove this later
+    window.history = [
+        { team: 'Test Team 1', verified: true, category: 'Mobile' },
+        { team: 'Test Team 2', verified: false, category: 'PC' }
+    ];
+    renderHistory();
+
     // Make inline script use same history as app.js
     function copyResults() {
         const text = document.getElementById('results-box').textContent;
