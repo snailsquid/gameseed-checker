@@ -413,9 +413,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Copy history button
     const copyHistoryBtn = document.getElementById('copy-history-btn');
     if (copyHistoryBtn) {
-        copyHistoryBtn.addEventListener('click', copyHistoryInline);
+        copyHistoryBtn.addEventListener('click', copyHistory);
     }
 
-    renderHistoryInline();
+    renderHistory();
     loadSavedPaths();
 });
