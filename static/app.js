@@ -6,10 +6,9 @@
 // Store file paths
 let mobileFilePath = null;
 let pcFilePath = null;
-let currentResults = null;
-let history = [];
 
-const SOURCE_PADDING = 12;
+window.currentResults = null;
+window.history = [];
 
 async function selectFile(kind) {
     try {
@@ -134,7 +133,7 @@ async function checkParticipants() {
  */
 function displayResults(data) {
     const stats = data.stats;
-    currentResults = data.results || [];
+    window.currentResults = data.results || [];
 
     document.getElementById('stat-total').textContent = stats.total;
     document.getElementById('stat-found').textContent = stats.registered_count;
@@ -142,7 +141,7 @@ function displayResults(data) {
     document.getElementById('stat-mobile').textContent = stats.mobile_count;
     document.getElementById('stat-pc').textContent = stats.pc_count;
 
-    const results = currentResults;
+    const results = window.currentResults;
     const allResults = document.getElementById('all-results');
 
     let tableRows = '';
@@ -188,14 +187,14 @@ function displayResults(data) {
 function renderHistory() {
     const historyList = document.getElementById('history-list');
 
-    if (history.length === 0) {
+    if (window.history.length === 0) {
         historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
         return;
     }
 
     let html = '';
-    for (let i = 0; i < history.length; i++) {
-        const entry = history[i];
+    for (let i = 0; i < window.history.length; i++) {
+        const entry = window.history[i];
         const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
         const statusText = entry.verified ? 'Verified' : 'Not Verify';
         html += `<div class="history-item">
@@ -215,7 +214,7 @@ function renderHistory() {
 }
 
 function deleteHistoryItem(index) {
-    history.splice(index, 1);
+    window.history.splice(index, 1);
     renderHistory();
 }
 
@@ -232,17 +231,21 @@ function addToHistory(results) {
     }
 
     for (const teamName in teams) {
-        history.unshift(teams[team]);
-        if (history.length > 50) history.pop();
+        window.history.unshift(teams[team]);
+        if (window.history.length > 50) window.history.pop();
     }
 
     renderHistory();
 }
 
-function copyHistory() {
-    if (history.length === 0) return;
+// Make functions globally accessible for inline scripts
+window.addToHistory = addToHistory;
+window.deleteHistoryItem = deleteHistoryItem;
 
-    const text = history.map(h => `${h.team}\t${h.verified ? 'Verified' : 'Not Verify'}\t\t${h.category}`).join('\n');
+function copyHistory() {
+    if (window.history.length === 0) return;
+
+    const text = window.history.map(h => `${h.team}\t${h.verified ? 'Verified' : 'Not Verify'}\t\t${h.category}`).join('\n');
     try {
         navigator.clipboard.writeText(text);
         alert('History copied!');
@@ -294,8 +297,8 @@ function copyResults() {
         return;
     }
 
-    if (currentResults && currentResults.length > 0) {
-        addToHistory(currentResults);
+    if (window.currentResults && window.currentResults.length > 0) {
+        addToHistory(window.currentResults);
     }
 
     navigator.clipboard.writeText(resultsText).then(() => {

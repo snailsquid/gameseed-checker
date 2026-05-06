@@ -96,5 +96,18 @@ Rentarou @BossTokoKue</textarea>
     </div>
 
     <script src="/static/app.js"></script>
+    <script>
+    function copyResults() {
+        const text = document.getElementById('results-box').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const hint = document.querySelector('.copy-hint');
+            hint.textContent = 'Copied!';
+            setTimeout(() => hint.textContent = 'Copy', 1000);
+        });
+        if (window.currentResults && window.currentResults.length > 0) {
+            window.addToHistory && window.addToHistory(window.currentResults);
+        }
+    }
+    </script>
 </body>
 </html>
