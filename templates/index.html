@@ -97,28 +97,6 @@ Rentarou @BossTokoKue</textarea>
 
 <script src="/static/app.js"></script>
     <script>
-    console.log('Inline script starting...');
-
-    // Mock history for testing - remove this later
-    // Use addToHistory with mock data to properly set local history variable
-    window.mockResults = [
-        { verified: true, team: 'Test Team 1', source: 'Mobile' },
-        { verified: true, team: 'Test Team 2', source: 'PC' }
-    ];
-
-    // Wait for app.js to load then add mock history
-    function setupMockHistory() {
-        console.log('setupMockHistory called, addToHistory type:', typeof addToHistory);
-        if (typeof addToHistory === 'function') {
-            console.log('Calling addToHistory with mock data');
-            addToHistory(window.mockResults);
-        } else {
-            console.log('Retrying in 100ms...');
-            setTimeout(setupMockHistory, 100);
-        }
-    }
-    setupMockHistory();
-
     // Make inline script use same history as app.js
     function copyResults() {
         const text = document.getElementById('results-box').textContent;
@@ -137,8 +115,8 @@ Rentarou @BossTokoKue</textarea>
 
     // Copy history button handler
     document.getElementById('copy-history-btn').addEventListener('click', function() {
-        if (typeof copyHistory === 'function') {
-            copyHistory();
+        if (typeof window.copyHistory === 'function') {
+            window.copyHistory();
         }
     });
     </script>
