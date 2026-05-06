@@ -276,65 +276,91 @@ function addToHistory(results) {
     if (verified.length === 0) return;
 
     const teams = {};
+    const teamNameGroups = {};
 
     for (const r of verified) {
         const team = r.team || '(No Team)';
         const name = r.name || '(No Name)';
 
-        if (!teams[team]) {
-            teams[team] = { team, verified: true, category: r.source, names: [name] };
+        let foundGroup = null;
+        for (const existingTeam in teamNameGroups) {
+            if (tokenSetRatio(existingTeam, team) >= 80) {
+                foundGroup = existingTeam;
+                break;
+            }
+        }
+
+        const canonicalTeam = foundGroup || team;
+
+        if (!teams[canonicalTeam]) {
+            teams[canonicalTeam] = { team: canonicalTeam, verified: true, category: r.source, names: [name], teamCount: 1 };
+            teamNameGroups[canonicalTeam] = true;
         } else {
-            teams[team].names.push(name);
+            teams[canonicalTeam].names.push(name);
+            teams[canonicalTeam].teamCount++;
         }
     }
 
+    let mostCommonTeamName = null;
+    let maxTeamCount = 0;
     for (const teamName in teams) {
-        const names = teams[teamName].names;
-        if (names.length === 0) continue;
-
-        const fuzzyGroups = [];
-        const assigned = new Set();
-
-        for (let i = 0; i < names.length; i++) {
-            if (assigned.has(i)) continue;
-            const group = [i];
-            assigned.add(i);
-
-            for (let j = i + 1; j < names.length; j++) {
-                if (assigned.has(j)) continue;
-                if (tokenSetRatio(names[i], names[j]) >= 80) {
-                    group.push(j);
-                    assigned.add(j);
-                }
-            }
-
-            fuzzyGroups.push(group.map(idx => names[idx]));
+        if (teams[teamName].teamCount > maxTeamCount) {
+            maxTeamCount = teams[teamName].teamCount;
+            mostCommonTeamName = teamName;
         }
-
-        fuzzyGroups.sort((a, b) => b.length - a.length);
-        const mostCommonGroup = fuzzyGroups[0] || [];
-
-        const nameCount = {};
-        for (const n of mostCommonGroup) {
-            nameCount[n] = (nameCount[n] || 0) + 1;
-        }
-
-        let bestName = mostCommonGroup[0] || '(No Name)';
-        let bestCount = nameCount[bestName] || 1;
-        for (const n in nameCount) {
-            if (nameCount[n] > bestCount) {
-                bestCount = nameCount[n];
-                bestName = n;
-            }
-        }
-
-        teams[teamName].name = bestName;
-        delete teams[teamName].names;
     }
 
-    for (const teamName in teams) {
-        if (history.some(h => h.team === teamName)) continue;
-        history.unshift(teams[teamName]);
+    const resultTeam = mostCommonTeamName || '(No Team)';
+    const teamEntry = teams[resultTeam];
+    if (!teamEntry) return;
+
+    const names = teamEntry.names;
+
+    const fuzzyGroups = [];
+    const assigned = new Set();
+
+    for (let i = 0; i < names.length; i++) {
+        if (assigned.has(i)) continue;
+        const group = [i];
+        assigned.add(i);
+
+        for (let j = i + 1; j < names.length; j++) {
+            if (assigned.has(j)) continue;
+            if (tokenSetRatio(names[i], names[j]) >= 80) {
+                group.push(j);
+                assigned.add(j);
+            }
+        }
+
+        fuzzyGroups.push(group.map(idx => names[idx]));
+    }
+
+    fuzzyGroups.sort((a, b) => b.length - a.length);
+    const mostCommonGroup = fuzzyGroups[0] || [];
+
+    const nameCount = {};
+    for (const n of mostCommonGroup) {
+        nameCount[n] = (nameCount[n] || 0) + 1;
+    }
+
+    let bestName = mostCommonGroup[0] || '(No Name)';
+    let bestCount = nameCount[bestName] || 1;
+    for (const n in nameCount) {
+        if (nameCount[n] > bestCount) {
+            bestCount = nameCount[n];
+            bestName = n;
+        }
+    }
+
+    const historyEntry = {
+        team: resultTeam,
+        verified: true,
+        category: teamEntry.category,
+        name: bestName
+    };
+
+    if (!history.some(h => h.team === resultTeam)) {
+        history.unshift(historyEntry);
         if (history.length > 50) history.pop();
     }
     window.appHistory = history;
