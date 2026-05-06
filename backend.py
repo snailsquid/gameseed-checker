@@ -177,6 +177,26 @@ def do_check(data):
     n_mob = sum(1 for r in results if r["verified"] and "Mobile" in r["source"])
     n_pc = sum(1 for r in results if r["verified"] and "PC" in r["source"])
 
+    verified_results = [r for r in results if r["verified"]]
+    if verified_results:
+        sources = []
+        for r in verified_results:
+            sources.extend(s.strip() for s in r["source"].split(','))
+
+        has_mob = 'Mobile' in sources
+        has_pc = 'PC' in sources
+
+        if has_mob and has_pc:
+            n_mob_sources = sum(1 for s in sources if s == 'Mobile')
+            n_pc_sources = sum(1 for s in sources if s == 'PC')
+
+            if n_mob_sources == n_pc_sources:
+                return {'error': 'Kategori terpisah. Pilih satu kategori'}
+            else:
+                correct = 'Mobile' if n_mob_sources > n_pc_sources else 'PC'
+                names_str = ', '.join(r["name"] for r in verified_results)
+                return {'error': f'{names_str} terdaftar dengan kategori yang salah, tolong isi kembali dengan kategori {correct}'}
+
     return {
         'results': results,
         'stats': {
