@@ -287,7 +287,7 @@ function clearResults() {
 /**
  * Copy results to clipboard
  */
-async function copyResults() {
+function copyResults() {
     const resultsText = document.getElementById('results-box').textContent;
 
     if (!resultsText) {
@@ -298,14 +298,13 @@ async function copyResults() {
         addToHistory(currentResults);
     }
 
-    try {
-        await navigator.clipboard.writeText(resultsText);
+    navigator.clipboard.writeText(resultsText).then(() => {
         const hint = document.querySelector('.copy-hint');
         hint.textContent = 'Copied!';
         setTimeout(() => hint.textContent = 'Copy', 1000);
-    } catch (err) {
+    }).catch(err => {
         console.error('Error copying to clipboard:', err);
-    }
+    });
 }
 
 // Initialize event handlers when DOM is ready
