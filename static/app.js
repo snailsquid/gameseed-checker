@@ -11,6 +11,55 @@ window.currentResults = null;
 window.appHistory = [];
 let history = [];
 
+// Fuzzy string matching utility
+function fuzzyScore(s1, s2) {
+    const str1 = s1.toLowerCase().replace(/^@/, '');
+    const str2 = s2.toLowerCase().replace(/^@/, '');
+    if (str1 === str2) return 100;
+    if (str1.length === 0 || str2.length === 0) return 0;
+
+    const d = [];
+    for (let i = 0; i <= str1.length; i++) {
+        d[i] = [i];
+    }
+    for (let j = 0; j <= str2.length; j++) {
+        d[0][j] = j;
+    }
+
+    for (let i = 1; i <= str1.length; i++) {
+        for (let j = 1; j <= str2.length; j++) {
+            const cost = str1[i-1] === str2[j-1] ? 0 : 1;
+            d[i][j] = Math.min(
+                d[i-1][j] + 1,
+                d[i][j-1] + 1,
+                d[i-1][j-1] + cost
+            );
+        }
+    }
+
+    const maxLen = Math.max(str1.length, str2.length);
+    const distance = d[str1.length][str2.length];
+    return Math.round((1 - distance / maxLen) * 100);
+}
+
+function tokenSetRatio(str1, str2) {
+    const tokens1 = str1.toLowerCase().replace(/^@/, '').split(/\s+/).filter(t => t);
+    const tokens2 = str2.toLowerCase().replace(/^@/, '').split(/\s+/).filter(t => t);
+
+    const allTokens = [...tokens1, ...tokens2];
+    const uniqueTokens = [...new Set(allTokens)];
+
+    const set1 = new Set(tokens1);
+    const set2 = new Set(tokens2);
+
+    let common = 0;
+    for (const t of uniqueTokens) {
+        if (set1.has(t) && set2.has(t)) common++;
+    }
+
+    return Math.round((common / uniqueTokens.length) * 100);
+}
+
 // Expose functions immediately
 function renderHistory() {
     const historyList = document.getElementById('history-list');
@@ -227,33 +276,60 @@ function addToHistory(results) {
     if (verified.length === 0) return;
 
     const teams = {};
-    const nameCount = {};
 
     for (const r of verified) {
         const team = r.team || '(No Team)';
         const name = r.name || '(No Name)';
 
         if (!teams[team]) {
-            teams[team] = { team, verified: true, category: r.source, name };
-            nameCount[team] = {};
-            nameCount[team][name] = 1;
+            teams[team] = { team, verified: true, category: r.source, names: [name] };
         } else {
-            nameCount[team][name] = (nameCount[team][name] || 0) + 1;
+            teams[team].names.push(name);
         }
     }
 
     for (const teamName in teams) {
-        let mostCommonName = teams[teamName].name;
-        let maxCount = nameCount[teamName][mostCommonName] || 1;
+        const names = teams[teamName].names;
+        if (names.length === 0) continue;
 
-        for (const name in nameCount[teamName]) {
-            if (nameCount[teamName][name] > maxCount) {
-                maxCount = nameCount[teamName][name];
-                mostCommonName = name;
+        const fuzzyGroups = [];
+        const assigned = new Set();
+
+        for (let i = 0; i < names.length; i++) {
+            if (assigned.has(i)) continue;
+            const group = [i];
+            assigned.add(i);
+
+            for (let j = i + 1; j < names.length; j++) {
+                if (assigned.has(j)) continue;
+                if (tokenSetRatio(names[i], names[j]) >= 80) {
+                    group.push(j);
+                    assigned.add(j);
+                }
+            }
+
+            fuzzyGroups.push(group.map(idx => names[idx]));
+        }
+
+        fuzzyGroups.sort((a, b) => b.length - a.length);
+        const mostCommonGroup = fuzzyGroups[0] || [];
+
+        const nameCount = {};
+        for (const n of mostCommonGroup) {
+            nameCount[n] = (nameCount[n] || 0) + 1;
+        }
+
+        let bestName = mostCommonGroup[0] || '(No Name)';
+        let bestCount = nameCount[bestName] || 1;
+        for (const n in nameCount) {
+            if (nameCount[n] > bestCount) {
+                bestCount = nameCount[n];
+                bestName = n;
             }
         }
 
-        teams[teamName].name = mostCommonName;
+        teams[teamName].name = bestName;
+        delete teams[teamName].names;
     }
 
     for (const teamName in teams) {
