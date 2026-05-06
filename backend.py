@@ -1,3 +1,5 @@
+import json
+import os
 import pandas as pd
 import re
 from flask import Flask, request, jsonify
@@ -7,9 +9,31 @@ from rapidfuzz import fuzz
 app = Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app)
 
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.json')
+
 _mobile_full = None
 _pc_full = None
 df_all = None
+
+
+def load_saved_paths():
+    global _mobile_full, _pc_full
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+                _mobile_full = config.get('mobile_path')
+                _pc_full = config.get('pc_path')
+        except Exception:
+            pass
+
+
+def save_paths():
+    try:
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump({'mobile_path': _mobile_full, 'pc_path': _pc_full}, f)
+    except Exception:
+        pass
 
 
 def clean_text(text):
@@ -176,6 +200,7 @@ def load_mobile():
     global _mobile_full
     data = request.json
     _mobile_full = data.get('path')
+    save_paths()
     result = try_merge(_mobile_full, _pc_full)
     return jsonify(result)
 
@@ -185,8 +210,17 @@ def load_pc():
     global _pc_full
     data = request.json
     _pc_full = data.get('path')
+    save_paths()
     result = try_merge(_mobile_full, _pc_full)
     return jsonify(result)
+
+
+@app.route('/api/get-saved-paths', methods=['GET'])
+def get_saved_paths():
+    load_saved_paths()
+    if _mobile_full is None and _pc_full is None:
+        return jsonify({'mobile_path': None, 'pc_path': None, 'any_loaded': False})
+    return jsonify({'mobile_path': _mobile_full, 'pc_path': _pc_full, 'any_loaded': True})
 
 
 @app.route('/api/check', methods=['POST'])
@@ -202,4 +236,5 @@ def check():
 
 
 if __name__ == '__main__':
+    load_saved_paths()
     app.run(debug=True, port=5000)

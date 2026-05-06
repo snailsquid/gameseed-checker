@@ -9,17 +9,12 @@ let pcFilePath = null;
 
 const SOURCE_PADDING = 12;
 
-/**
- * Open file dialog for Mobile or PC CSV
- * @param {string} kind - 'mobile' or 'pc'
- */
 async function selectFile(kind) {
     try {
         const result = await pywebview.api.open_file_dialog();
         if (result && result.length > 0) {
             const filePath = result[0];
-            
-            // Send to Flask backend
+
             const endpoint = kind === 'mobile' ? '/api/load-mobile' : '/api/load-pc';
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -27,18 +22,16 @@ async function selectFile(kind) {
                 body: JSON.stringify({path: filePath})
             });
             const data = await response.json();
-            
-            // Update status
+
             if (data.success) {
                 if (kind === 'mobile') {
                     mobileFilePath = filePath;
-                    localStorage.setItem('mobilePath', filePath);
                     document.getElementById('mobile-count').textContent = `(${data.count})`;
                 } else {
                     pcFilePath = filePath;
-                    localStorage.setItem('pcPath', filePath);
                     document.getElementById('pc-count').textContent = `(${data.count})`;
                 }
+                updateHeaderStatus();
             } else {
                 document.getElementById(`${kind}-count`).textContent = '';
             }
@@ -48,45 +41,57 @@ async function selectFile(kind) {
     }
 }
 
-/**
- * Load saved CSV paths from localStorage
- */
-async function loadSavedPaths() {
-    const savedMobile = localStorage.getItem('mobilePath');
-    const savedPc = localStorage.getItem('pcPath');
-    
-    if (savedMobile) {
-        try {
-            const response = await fetch('/api/load-mobile', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({path: savedMobile})
-            });
-            const data = await response.json();
-            if (data.success) {
-                mobileFilePath = savedMobile;
-                document.getElementById('mobile-count').textContent = `(${data.count})`;
-            }
-        } catch (err) {
-            console.error('Error loading saved mobile path:', err);
-        }
+function updateHeaderStatus() {
+    const hasMobile = mobileFilePath !== null;
+    const hasPc = pcFilePath !== null;
+    const statusEl = document.getElementById('status');
+
+    if (hasMobile && hasPc) {
+        statusEl.textContent = 'Both CSV loaded';
+    } else if (hasMobile) {
+        statusEl.textContent = 'Mobile CSV loaded';
+    } else if (hasPc) {
+        statusEl.textContent = 'PC CSV loaded';
+    } else {
+        statusEl.textContent = 'No CSV loaded';
     }
-    
-    if (savedPc) {
-        try {
-            const response = await fetch('/api/load-pc', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({path: savedPc})
-            });
-            const data = await response.json();
-            if (data.success) {
-                pcFilePath = savedPc;
-                document.getElementById('pc-count').textContent = `(${data.count})`;
+}
+
+async function loadSavedPaths() {
+    try {
+        const response = await fetch('/api/get-saved-paths');
+        const data = await response.json();
+
+        if (data.any_loaded) {
+            if (data.mobile_path) {
+                const res = await fetch('/api/load-mobile', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({path: data.mobile_path})
+                });
+                const result = await res.json();
+                if (result.success) {
+                    mobileFilePath = data.mobile_path;
+                    document.getElementById('mobile-count').textContent = `(${result.count})`;
+                }
             }
-        } catch (err) {
-            console.error('Error loading saved pc path:', err);
+
+            if (data.pc_path) {
+                const res = await fetch('/api/load-pc', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({path: data.pc_path})
+                });
+                const result = await res.json();
+                if (result.success) {
+                    pcFilePath = data.pc_path;
+                    document.getElementById('pc-count').textContent = `(${result.count})`;
+                }
+            }
+            updateHeaderStatus();
         }
+    } catch (err) {
+        console.error('Error loading saved paths:', err);
     }
 }
 
@@ -205,10 +210,9 @@ function clearResults() {
     // Reset file status
     mobileFilePath = null;
     pcFilePath = null;
-    localStorage.removeItem('mobilePath');
-    localStorage.removeItem('pcPath');
     document.getElementById('mobile-count').textContent = '';
     document.getElementById('pc-count').textContent = '';
+    updateHeaderStatus();
 }
 
 /**
