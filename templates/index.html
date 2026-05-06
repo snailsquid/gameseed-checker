@@ -97,22 +97,6 @@ Rentarou @BossTokoKue</textarea>
 
 <script src="/static/app.js"></script>
     <script>
-    // Make inline script use same history as app.js
-    function copyResults() {
-        const text = document.getElementById('results-box').textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            const hint = document.querySelector('.copy-hint');
-            hint.textContent = 'Copied!';
-            setTimeout(() => hint.textContent = 'Copy', 1000);
-        }).catch(err => {
-            console.error('Error copying:', err);
-        });
-        // Use app.js's addToHistory if available
-        if (window.currentResults && window.currentResults.length > 0 && window.addToHistory) {
-            window.addToHistory(window.currentResults);
-        }
-    }
-
     // Copy history button handler
     document.getElementById('copy-history-btn').addEventListener('click', function() {
         if (typeof window.copyHistory === 'function') {
