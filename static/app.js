@@ -300,7 +300,9 @@ async function copyResults() {
 
     try {
         await navigator.clipboard.writeText(resultsText);
-        alert('Results copied to clipboard!');
+        const hint = document.querySelector('.copy-hint');
+        hint.textContent = 'Copied!';
+        setTimeout(() => hint.textContent = 'Copy', 1000);
     } catch (err) {
         console.error('Error copying to clipboard:', err);
     }

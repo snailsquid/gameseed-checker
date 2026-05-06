@@ -96,15 +96,5 @@ Rentarou @BossTokoKue</textarea>
     </div>
 
     <script src="/static/app.js"></script>
-    <script>
-    function copyResults() {
-        const text = document.getElementById('results-box').textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            const hint = document.querySelector('.copy-hint');
-            hint.textContent = 'Copied!';
-            setTimeout(() => hint.textContent = 'Copy', 1000);
-        });
-    }
-    </script>
 </body>
 </html>
