@@ -13,8 +13,12 @@ let history = [];
 
 // Expose functions immediately
 function renderHistory() {
+    console.log('renderHistory called, history length:', history.length);
     const historyList = document.getElementById('history-list');
-    if (!historyList) return;
+    if (!historyList) {
+        console.log('history-list element not found!');
+        return;
+    }
 
     if (history.length === 0) {
         historyList.innerHTML = '<div class="history-empty" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">No history yet</div>';
