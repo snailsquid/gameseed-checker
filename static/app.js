@@ -260,8 +260,8 @@ function renderHistory() {
     }
 
     let html = '';
-    for (let i = 0; i < window.history.length; i++) {
-        const entry = window.history[i];
+    for (let i = 0; i < history.length; i++) {
+        const entry = history[i];
         const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
         const statusText = entry.verified ? 'Verified' : 'Not Verify';
         html += `<div class="history-item">
