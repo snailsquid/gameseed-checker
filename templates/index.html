@@ -97,26 +97,6 @@ Rentarou @BossTokoKue</textarea>
 
 <script src="/static/app.js"></script>
     <script>
-    // Mock history - use addToHistory to properly add to app.js's local history
-    window.mockResults = [
-        { verified: true, team: 'Test Team 1', source: 'Mobile' },
-        { verified: true, team: 'Test Team 2', source: 'PC' }
-    ];
-
-    function addMockHistory() {
-        if (typeof window.addToHistory === 'function') {
-            window.addToHistory(window.mockResults);
-        } else {
-            setTimeout(addMockHistory, 100);
-        }
-    }
-    // Wait for app.js to be ready, then add mock history
-    if (document.readyState === 'complete') {
-        addMockHistory();
-    } else {
-        window.addEventListener('load', addMockHistory);
-    }
-
     // Make inline script use same history as app.js
     function copyResults() {
         const text = document.getElementById('results-box').textContent;
