@@ -298,6 +298,14 @@ body {
   background: var(--bg);
 }
 
+.results-table tbody tr.fuzzy-match {
+  background: #fef3cd;
+}
+
+.results-table tbody tr.fuzzy-match:hover {
+  background: #fce8a6;
+}
+
 .copy-hint {
   position: absolute;
   top: 8px;

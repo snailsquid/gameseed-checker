@@ -63,3 +63,5 @@ class TestDoCheck:
 
         assert result['stats']['registered_count'] == 1
         assert result['stats']['not_registered_count'] == 0
+        assert result['results'][0]['match_type'] == 'exact'
+        assert result['results'][0]['matched_to'] == ''

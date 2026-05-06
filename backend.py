@@ -2,6 +2,7 @@ import pandas as pd
 import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from rapidfuzz import fuzz
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app)
@@ -98,6 +99,9 @@ def do_check(data):
     global df_all
     results = []
 
+    all_names = df_all['Nama Clean'].tolist()
+    all_teams = df_all['Team'].tolist()
+
     for item in data:
         match = df_all[df_all['Nama Clean'] == item["clean"]]
         if not match.empty:
@@ -108,15 +112,40 @@ def do_check(data):
                 "name": item["original"],
                 "source": ", ".join(match['source'].unique()),
                 "team": team,
-                "verified": True
+                "verified": True,
+                "match_type": "exact",
+                "matched_to": ""
             })
         else:
-            results.append({
-                "name": item["original"],
-                "source": "",
-                "team": "",
-                "verified": False
-            })
+            best_score = 0
+            best_idx = -1
+            for idx, registered_name in enumerate(all_names):
+                score = fuzz.ratio(item["clean"], registered_name)
+                if score > best_score and score >= 80:
+                    best_score = score
+                    best_idx = idx
+
+            if best_idx >= 0:
+                match = df_all.iloc[best_idx:best_idx+1]
+                team_values = match['Team'].dropna().unique()
+                team = team_values[0] if len(team_values) > 0 else ''
+                results.append({
+                    "name": item["original"],
+                    "source": ", ".join(match['source'].unique()),
+                    "team": team,
+                    "verified": True,
+                    "match_type": "fuzzy",
+                    "matched_to": match.iloc[0]['Nama Asli']
+                })
+            else:
+                results.append({
+                    "name": item["original"],
+                    "source": "",
+                    "team": "",
+                    "verified": False,
+                    "match_type": "none",
+                    "matched_to": ""
+                })
 
     total = len(data)
     n_registered = sum(1 for r in results if r["verified"])
