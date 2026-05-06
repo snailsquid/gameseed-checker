@@ -52,31 +52,6 @@ function deleteHistoryItem(index) {
     renderHistory();
 }
 
-function addToHistory(results) {
-    const verified = results.filter(r => r.verified);
-    if (verified.length === 0) return;
-
-    const teams = {};
-    for (const r of verified) {
-        const team = r.team || '(No Team)';
-        if (!teams[team]) {
-            teams[team] = { team, verified: true, category: r.source };
-        }
-    }
-
-    for (const teamName in teams) {
-        history.unshift(teams[team]);
-        if (history.length > 50) history.pop();
-    }
-    window.appHistory = history;
-
-    renderHistory();
-}
-
-window.addToHistory = addToHistory;
-window.deleteHistoryItem = deleteHistoryItem;
-window.renderHistory = renderHistory;
-
 async function selectFile(kind) {
     try {
         const result = await pywebview.api.open_file_dialog();
@@ -316,6 +291,7 @@ function addToHistory(results) {
 // Make functions globally accessible for inline scripts
 window.addToHistory = addToHistory;
 window.deleteHistoryItem = deleteHistoryItem;
+window.renderHistory = renderHistory;
 
 function copyHistory() {
     if (window.appHistory.length === 0) return;
