@@ -118,7 +118,6 @@ function displayResults(data) {
     </table>`;
 
     const notRegistered = results.filter(r => !r.verified);
-    const fuzzyMatches = results.filter(r => r.match_type === 'fuzzy');
     let copyText = '';
 
     if (notRegistered.length > 0) {
@@ -127,10 +126,6 @@ function displayResults(data) {
             '\n\nBisa melakukan pendaftaran melalui form ya kak\nuntuk melanjutkan tahap verifikasi.';
     } else if (results.length > 0) {
         copyText = '✅ Verified\nMohon ditunggu team ID nya ya kak 🙌';
-        if (fuzzyMatches.length > 0) {
-            copyText += '\n\n⚠️ Fuzzy matches (' + fuzzyMatches.length + '):\n' +
-                fuzzyMatches.map(r => `  • ${r.name} → ${r.matched_to}`).join('\n');
-        }
     } else {
         copyText = 'Nothing to see here';
     }
