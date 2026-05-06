@@ -408,9 +408,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Copy history button
     const copyHistoryBtn = document.getElementById('copy-history-btn');
     if (copyHistoryBtn) {
-        copyHistoryBtn.addEventListener('click', copyHistory);
+        copyHistoryBtn.addEventListener('click', copyHistoryInline);
     }
 
-    renderHistory();
+    renderHistoryInline();
     loadSavedPaths();
 });
