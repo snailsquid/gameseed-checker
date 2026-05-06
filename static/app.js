@@ -32,9 +32,11 @@ async function selectFile(kind) {
             if (data.success) {
                 if (kind === 'mobile') {
                     mobileFilePath = filePath;
+                    localStorage.setItem('mobilePath', filePath);
                     document.getElementById('mobile-count').textContent = `(${data.count})`;
                 } else {
                     pcFilePath = filePath;
+                    localStorage.setItem('pcPath', filePath);
                     document.getElementById('pc-count').textContent = `(${data.count})`;
                 }
             } else {
@@ -43,6 +45,48 @@ async function selectFile(kind) {
         }
     } catch (err) {
         console.error('Error selecting file:', err);
+    }
+}
+
+/**
+ * Load saved CSV paths from localStorage
+ */
+async function loadSavedPaths() {
+    const savedMobile = localStorage.getItem('mobilePath');
+    const savedPc = localStorage.getItem('pcPath');
+    
+    if (savedMobile) {
+        try {
+            const response = await fetch('/api/load-mobile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: savedMobile})
+            });
+            const data = await response.json();
+            if (data.success) {
+                mobileFilePath = savedMobile;
+                document.getElementById('mobile-count').textContent = `(${data.count})`;
+            }
+        } catch (err) {
+            console.error('Error loading saved mobile path:', err);
+        }
+    }
+    
+    if (savedPc) {
+        try {
+            const response = await fetch('/api/load-pc', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: savedPc})
+            });
+            const data = await response.json();
+            if (data.success) {
+                pcFilePath = savedPc;
+                document.getElementById('pc-count').textContent = `(${data.count})`;
+            }
+        } catch (err) {
+            console.error('Error loading saved pc path:', err);
+        }
     }
 }
 
@@ -161,6 +205,8 @@ function clearResults() {
     // Reset file status
     mobileFilePath = null;
     pcFilePath = null;
+    localStorage.removeItem('mobilePath');
+    localStorage.removeItem('pcPath');
     document.getElementById('mobile-count').textContent = '';
     document.getElementById('pc-count').textContent = '';
 }
@@ -214,4 +260,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (copyBtn) {
         copyBtn.addEventListener('click', copyResults);
     }
+    
+    loadSavedPaths();
 });
