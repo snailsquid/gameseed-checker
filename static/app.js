@@ -194,18 +194,29 @@ function renderHistory() {
     }
 
     let html = '';
-    for (const entry of history) {
+    for (let i = 0; i < history.length; i++) {
+        const entry = history[i];
         const statusClass = entry.verified ? 'history-item-verified' : 'history-item-notverified';
         const statusText = entry.verified ? 'Verified' : 'Not Verify';
         html += `<div class="history-item">
-            <div class="history-item-team">${escapeHtml(entry.team)}</div>
-            <div class="history-item-status">
-                <span class="${statusClass}">${statusText}</span>
-                <span>${entry.category}</span>
+            <div class="history-item-row">
+                <div class="history-item-info">
+                    <div class="history-item-team">${escapeHtml(entry.team)}</div>
+                    <div class="history-item-status">
+                        <span class="${statusClass}">${statusText}</span>
+                        <span>${entry.category}</span>
+                    </div>
+                </div>
+                <button class="history-delete-btn" onclick="deleteHistoryItem(${i})">×</button>
             </div>
         </div>`;
     }
     historyList.innerHTML = html;
+}
+
+function deleteHistoryItem(index) {
+    history.splice(index, 1);
+    renderHistory();
 }
 
 function addToHistory(results) {
@@ -228,12 +239,12 @@ function addToHistory(results) {
     renderHistory();
 }
 
-async function copyHistory() {
+function copyHistory() {
     if (history.length === 0) return;
 
     const text = history.map(h => `${h.team}\t${h.verified ? 'Verified' : 'Not Verify'}\t\t${h.category}`).join('\n');
     try {
-        await navigator.clipboard.writeText(text);
+        navigator.clipboard.writeText(text);
         alert('History copied!');
     } catch (err) {
         console.error('Error copying history:', err);
